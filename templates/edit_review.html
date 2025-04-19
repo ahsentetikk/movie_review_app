@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Review</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Edit Your Review for “{{ review.movie.title }}”</h1>
+  <form method="POST">
+    <label>Rating (1–10):</label>
+    <input type="number" name="rating" min="1" max="10" value="{{ review.rating }}" required><br>
+    <label>Comment:</label><br>
+    <textarea name="comment" rows="4">{{ review.comment }}</textarea><br>
+    <button type="submit">Update</button>
+  </form>
+  <a href="{{ url_for('movie_detail', movie_id=review.movie_id) }}">← Back to movie</a>
+</body>
+</html>

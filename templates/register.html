@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Kayıt Ol</title>
+  <style>
+    body {
+      background-color: #f4f6f8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .register-container {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 24px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input {
+      padding: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    button {
+      padding: 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    p {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    a {
+      color: #4CAF50;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h2>Kayıt Ol</h2>
+    <form method="POST">
+      <input name="username" placeholder="Kullanıcı Adı" required>
+      <input name="email" placeholder="E-posta" required type="email">
+      <input name="full_name" placeholder="Ad Soyad" required>
+      <input name="birth_year" placeholder="Doğum Yılı" required type="number">
+      <input name="gender" placeholder="Cinsiyet">
+      <input name="country" placeholder="Ülke">
+      <input name="password" placeholder="Şifre" required type="password">
+      <button type="submit">Kayıt Ol</button>
+    </form>
+    <p>Zaten hesabın var mı? <a href="{{ url_for('login') }}">Giriş Yap</a></p>
+    <p><a href="{{ url_for('home') }}">← Film Listesine Dön</a></p>
+  </div>
+</body>
+</html>

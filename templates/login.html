@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Giriş Yap</title>
+  <style>
+    body {
+      background-color: #f4f6f8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 24px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input {
+      padding: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    button {
+      padding: 12px;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1976D2;
+    }
+
+    p {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    a {
+      color: #2196F3;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Giriş Yap</h2>
+    <form method="POST">
+      <input name="username" placeholder="Kullanıcı Adı" required>
+      <input name="password" placeholder="Şifre" type="password" required>
+      <button type="submit">Giriş</button>
+    </form>
+    <p>Hesabın yok mu? <a href="{{ url_for('register') }}">Kayıt Ol</a></p>
+    <p><a href="{{ url_for('home') }}">← Film Listesine Dön</a></p>
+  </div>
+</body>
+</html>
