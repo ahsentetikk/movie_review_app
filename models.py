@@ -43,17 +43,17 @@ class Review(db.Model):
     comment = db.Column(db.Text)
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship('User', backref='reviews')
-    movie = db.relationship('Movie', backref='reviews')
+    user = db.relationship('User', backref='reviews') #Bir yorumun kullanıcısı vardır (user). Ayrıca bir kullanıcıya bağlı birden fazla yorum (reviews) olabilir."
+    movie = db.relationship('Movie', backref='reviews')#Bir yorumun ait olduğu bir film vardır. Ayrıca bir filme ait birden fazla yorum (reviews) olabilir.
 
-    # Cevaplar (kendiyle ilişkili yorumlar)
+   
     replies = db.relationship(
         'Review',
-        backref=db.backref('parent', remote_side=[id]),
-        cascade='all, delete-orphan'
+        backref=db.backref('parent', remote_side=[id]),#Bir yorumun birden fazla cevabı (reply) olabilir
+        cascade='all, delete-orphan' # ana yorum silinirse ona bağlı bütün cevap yorumları da otomatik silinir
     )
 
-    # ❌ BURAYA review ya da likes adında başka relationship eklenmeyecek!
+   
 
 class ReviewLike(db.Model):
     __tablename__ = 'review_like'
@@ -62,7 +62,11 @@ class ReviewLike(db.Model):
     review_id = db.Column(db.Integer, db.ForeignKey('review.id'), nullable=False)
     is_like = db.Column(db.Boolean, nullable=False)
 
-    user = db.relationship('User', backref='review_likes')
+    user = db.relationship('User', backref='review_likes')#Bir kullanıcı birden fazla yorum beğenmiştir
 
-    # ✅ Burada Review.likes tanımını sağlıyoruz
-    review = db.relationship('Review', backref=db.backref('likes', cascade='all, delete-orphan'))
+  
+    review = db.relationship(
+        'Review', 
+         backref=db.backref('likes', cascade='all, delete-orphan')#Eğer bir yorum (Review) silinirse, o yoruma yapılmış tüm like/dislike kayıtları da otomatik silinir.Böylece veir tabanında kaıtlı kalmıyor.
+
+    )

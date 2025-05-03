@@ -1,18 +1,161 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-  <title>Edit Review</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yorum Düzenle – {{ review.movie.title }}</title>
+  <style>
+    :root {
+      --primary:     #2563eb;
+      --secondary:   #64748b;
+      --light-bg:    #f4f6f8;
+      --dark-text:   #1e293b;
+      --gray-border: #cbd5e1;
+      --shadow-md:   0 4px 6px rgba(0,0,0,0.1);
+      --radius-sm:   0.5rem;
+      --radius-md:   1rem;
+    }
+
+    /* Genel gövde ayarları */
+    body {
+      background-color: var(--light-bg);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: var(--dark-text);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    /* Sayfa ortalama düzen */
+    .container {
+      max-width: 600px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+
+    /* Kart stili */
+    .card {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      padding: 30px;
+    }
+
+    /* Başlık */
+    .card-title {
+      margin-bottom: 25px;
+      font-size: 1.6rem;
+      text-align: center;
+      color: var(--dark-text);
+    }
+
+    /* Form grupları */
+    .form-group {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .form-group label {
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark-text);
+    }
+    .form-group input,
+    .form-group textarea {
+      padding: 12px;
+      border: 2px solid var(--gray-border);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+      background: #fff;
+    }
+
+    /* Buton grubu */
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    /* Buton temel stili */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 24px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Birincil buton */
+    .btn-primary {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background-color: #1e40af;
+    }
+
+    /* İkincil buton/link */
+    .btn-secondary {
+      background-color: var(--secondary);
+      color: #ffffff;
+    }
+    .btn-secondary:hover {
+      background-color: #475569;
+    }
+  </style>
 </head>
 <body>
-  <h1>Edit Your Review for “{{ review.movie.title }}”</h1>
-  <form method="POST">
-    <label>Rating (1–10):</label>
-    <input type="number" name="rating" min="1" max="10" value="{{ review.rating }}" required><br>
-    <label>Comment:</label><br>
-    <textarea name="comment" rows="4">{{ review.comment }}</textarea><br>
-    <button type="submit">Update</button>
-  </form>
-  <a href="{{ url_for('movie_detail', movie_id=review.movie_id) }}">← Back to movie</a>
+  <div class="container">
+    <div class="card">
+      <h1 class="card-title">“{{ review.movie.title }}” için Yorumunu Düzenle</h1>
+      <form method="POST" class="edit-review-form">
+        <div class="form-group">
+          <label for="rating">Puan (1–10)</label>
+          <input
+            type="number"
+            id="rating"
+            name="rating"
+            min="1"
+            max="10"
+            value="{{ review.rating }}"
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label for="comment">Yorum</label>
+          <textarea
+            id="comment"
+            name="comment"
+            rows="4"
+            required
+          >{{ review.comment }}</textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Güncelle</button>
+          <a href="{{ url_for('movie_detail', movie_id=review.movie_id) }}"
+             class="btn btn-secondary">
+            İptal
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
 </body>
 </html>

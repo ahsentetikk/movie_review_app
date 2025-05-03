@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'your_secret_key'
 
-# Extensions
+
 db.init_app(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
@@ -19,7 +19,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-# ——— ÖRNEK FİLM EKLEME ———
+ 
 @app.route('/add-sample-movies')
 def add_sample_movies():
     sample_movies = [
@@ -203,6 +203,96 @@ def add_sample_movies():
             gross="$460.50M",
             image_url="images/10.jpg"
         ),
+           Movie(
+            title="The Prestige",
+            year=2006,
+            certificate="PG-13",
+            runtime="130 min",
+            genre="Drama, Mystery, Sci-Fi",
+            imdb_rating=8.5,
+            overview="Two stage magicians engage in a competitive rivalry.",
+            meta_score=66,
+            director="Christopher Nolan",
+            star1="Christian Bale",
+            star2="Hugh Jackman",
+            star3="Scarlett Johansson",
+            star4="Michael Caine",
+            no_of_votes=1300000,
+            gross="$109.68M",
+            image_url="images/11.jpg"
+        ),
+        Movie(
+            title="Whiplash",
+            year=2014,
+            certificate="R",
+            runtime="106 min",
+            genre="Drama, Music",
+            imdb_rating=8.5,
+            overview="A young drummer enrolls in a cut-throat music conservatory.",
+            meta_score=88,
+            director="Damien Chazelle",
+            star1="Miles Teller",
+            star2="J.K. Simmons",
+            star3="Paul Reiser",
+            star4="Melissa Benoist",
+            no_of_votes=800000,
+            gross="$49.00M",
+            image_url="images/12.jpg"
+        ),
+        Movie(
+            title="The Social Network",
+            year=2010,
+            certificate="PG-13",
+            runtime="120 min",
+            genre="Biography, Drama",
+            imdb_rating=7.7,
+            overview="Harvard student Mark Zuckerberg creates Facebook.",
+            meta_score=95,
+            director="David Fincher",
+            star1="Jesse Eisenberg",
+            star2="Andrew Garfield",
+            star3="Justin Timberlake",
+            star4="Armie Hammer",
+            no_of_votes=700000,
+            gross="$224.92M",
+            image_url="images/13.jpg"
+        ),
+        Movie(
+            title="The Lord of the Rings: The Return of the King",
+            year=2003,
+            certificate="PG-13",
+            runtime="201 min",
+            genre="Action, Adventure, Drama",
+            imdb_rating=9.0,
+            overview="Gandalf and Aragorn lead the final battle against Sauron's army.",
+            meta_score=94,
+            director="Peter Jackson",
+            star1="Elijah Wood",
+            star2="Viggo Mortensen",
+            star3="Ian McKellen",
+            star4="Orlando Bloom",
+            no_of_votes=1800000,
+            gross="$1.14B",
+            image_url="images/14.jpg"
+        ),
+        Movie(
+            title="Parasite",
+            year=2019,
+            certificate="R",
+            runtime="132 min",
+            genre="Drama, Thriller",
+            imdb_rating=8.5,
+            overview="A poor family schemes to become employed by a wealthy one.",
+            meta_score=96,
+            director="Bong Joon Ho",
+            star1="Kang-ho Song",
+            star2="Sun-kyun Lee",
+            star3="Yeo-jeong Jo",
+            star4="Woo-sik Choi",
+            no_of_votes=900000,
+            gross="$258.70M",
+            image_url="images/15.jpg"
+        ),
     ]
 
     db.session.add_all(sample_movies)
@@ -210,12 +300,12 @@ def add_sample_movies():
     return "10 sample movies added!"
 
 
-# ——— KAYIT ———
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         user = User(
-            username   = request.form['username'],
+            username   = request.form['username'], 
             email      = request.form['email'],
             password   = bcrypt.generate_password_hash(request.form['password']).decode('utf-8'),
             full_name  = request.form['full_name'],
@@ -223,18 +313,18 @@ def register():
             gender     = request.form['gender'],
             country    = request.form['country']
         )
-        db.session.add(user)
-        db.session.commit()
+        db.session.add(user)#kullanıcı veritabanına eklenir
+        db.session.commit()#değişiklikler kaydedilir
         flash('Kayıt başarılı! Şimdi giriş yapabilirsiniz.')
-        return redirect(url_for('login'))
-    return render_template("register.html")
+        return redirect(url_for('login')) #user login sayfasına yönlendiri
+    return render_template("register.html")#GET yardımı ile register html sayfasını açıyor
 
 
-# ——— GİRİŞ ———
-@app.route('/login', methods=['GET', 'POST'])
+
+@app.route('/login', methods=['GET', 'POST']) # hem GET (login formunu görüntüleme) hem de POST (giriş bilgilerini gönderme) isteklerini kabul eder.
 def login():
     if request.method == 'POST':
-        user = User.query.filter_by(username=request.form['username']).first()
+        user = User.query.filter_by(username=request.form['username']).first()# Kullanıcı adı ile veritabanında kullanıcı arar
         if user and bcrypt.check_password_hash(user.password, request.form['password']):
             login_user(user)
             return redirect(url_for('home'))
@@ -242,7 +332,7 @@ def login():
     return render_template("login.html")
 
 
-# ——— ÇIKIŞ ———
+# Çıkış 
 @app.route('/logout')
 @login_required
 def logout():
@@ -250,75 +340,75 @@ def logout():
     return redirect(url_for('login'))
 
 
-# ——— ANA SAYFA (Film Listesi) ———
+# Anasayfa 
 @app.route('/')
 def home():
-    query = request.args.get('query', '')  # URL'den ?query=... parametresi alınıyor
-    if query:
-        movies = Movie.query.filter(Movie.title.ilike(f"%{query}%")).all()
+    query = request.args.get('query', '')  # Arama çubuğundan gelen sorgu 
+    if query: #search butonu için yaptım 
+        movies = Movie.query.filter(Movie.title.ilike(f"%{query}%")).all() #burada title araması yapılıyor
     else:
-        movies = Movie.query.all()
+        movies = Movie.query.all() # Eğer arama yapılmadıysa tüm filmleri getir
     return render_template("home.html", movies=movies)
 
 
 
-# ——— FİLM DETAY & YORUMLAR/REPLY ———
+# Film detayları ve yorumlar
 @app.route('/movie/<int:movie_id>', methods=['GET', 'POST'])
-@login_required
+@login_required #yorum yapabilmek için giriş yapmış olmalısınız hatta bunun için bir uyarı mesajı verebilirsin(yorum sadece)
 def movie_detail(movie_id):
-    movie = Movie.query.get_or_404(movie_id)
+    movie = Movie.query.get_or_404(movie_id) #movie_id ile veritabanından filmi getirir, bulamazsa 404 hatası döner
 
     if request.method == 'POST':
-        parent_id = request.form.get('parent_id') or None
-        comment   = request.form['comment']
+        parent_id = request.form.get('parent_id') or None # Kullanıcının cevabını alır
+        comment   = request.form['comment'] # Kullanıcının yazdığı yorum alınır
 
-        # Eğer parent_id varsa bu bir REPLY, rating formda yok
-        if parent_id:
-            # Reply’ler için biz rating=0 atıyoruz (model nullable değilse)
+       
+        if parent_id: # eğer parent_id varsa, bu bir yorumun cevabıdır
+           
             review = Review(
                 user_id   = current_user.id,
                 movie_id  = movie.id,
-                rating    = 0,
+                rating    = 0,         # cevap yorumlarında puan verilmez, sıfır atanır
                 comment   = comment,
-                parent_id = parent_id
+                parent_id = parent_id  # bağlı olduğu ana yorum
             )
-        else:
-            # Normal yeni yorum
+        else: # eğer parent_id yoksa, bu doğrudan filme yazılan yeni bir yorumdur
+           
             rating = int(request.form['rating'])
             review = Review(
                 user_id   = current_user.id,
                 movie_id  = movie.id,
                 rating    = rating,
                 comment   = comment,
-                parent_id = None
+                parent_id = None  # Ana yorum
             )
 
         db.session.add(review)
         db.session.commit()
         return redirect(url_for('movie_detail', movie_id=movie.id))
 
-    # Sadece ana yorumları getir
-    reviews = Review.query.filter_by(movie_id=movie.id, parent_id=None).all()
+    # GET isteği: gfilm detay sayfası açıldığında burası çalışır
+    reviews = Review.query.filter_by(movie_id=movie.id, parent_id=None).all() # sadece ana yorumlar (cevaplar değil) çekilir
     return render_template("movie_detail.html", movie=movie, reviews=reviews)
 
 
-# ——— LIKE / DISLIKE ———
+# Like/dislike
 @app.route('/review/<int:review_id>/react', methods=['POST'])
 @login_required
-def react_review(review_id):
-    review = Review.query.get_or_404(review_id)
-    is_like = request.form.get('is_like') == '1'
+def react_review(review_id):  
+    review = Review.query.get_or_404(review_id) # review_id ile yorumu bulur, bulamazsa 404 hatası verir
+    is_like = request.form.get('is_like') == '1' # formdan gelen is_like bilgisi alınır, '1' ise True (like), değilse False (dislike)
     existing = ReviewLike.query.filter_by(
         user_id=current_user.id,
         review_id=review_id
     ).first()
 
-    if existing:
+    if existing: # eğer daha önce bir like/dislike yaptıysa
         if existing.is_like == is_like:
             db.session.delete(existing)
-        else:
+        else: 
             existing.is_like = is_like
-    else:
+    else: # hiç tepki vermemişse (ilk defa like/dislike yapıyorsa)
         like = ReviewLike(
             user_id   = current_user.id,
             review_id = review_id,
@@ -330,17 +420,17 @@ def react_review(review_id):
     return redirect(url_for('movie_detail', movie_id=review.movie_id))
 
 
-# ——— YORUM GÜNCELLE ———
+# yorum güncelle
 @app.route('/review/<int:review_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_review(review_id):
-    review = Review.query.get_or_404(review_id)
-    if review.user_id != current_user.id:
-        abort(403)
+    review = Review.query.get_or_404(review_id) 
+    if review.user_id != current_user.id:    # eğer yorumu düzenlemeye çalışan kişi yorumu yazan kişi değilse 403 hatası 
+        abort(403)  #yetkisiz işlem için 
 
     if request.method == 'POST':
-        review.rating  = int(request.form['rating'])
-        review.comment = request.form['comment']
+        review.rating  = int(request.form['rating']) #yorumda puanı güncelle
+        review.comment = request.form['comment'] #yorumda yorumu güncelle
         db.session.commit()
         flash("Yorumunuz güncellendi.")
         return redirect(url_for('movie_detail', movie_id=review.movie_id))
@@ -348,17 +438,16 @@ def edit_review(review_id):
     return render_template("edit_review.html", review=review)
 
 
-# ——— YORUM SİL ———
+# yorum silme
 @app.route('/review/<int:review_id>/delete', methods=['POST'])
 @login_required
 def delete_review(review_id):
-    review = Review.query.get_or_404(review_id)
-    if review.user_id != current_user.id:
-        abort(403)
+    review = Review.query.get_or_404(review_id) 
+    if review.user_id != current_user.id:  # eğer yorumu silmeye çalışan kişi yorumu yazan kişi değilse 403 hatası
+        abort(403) 
 
-    # önce bağlı reply ve like kayıtlarının silinmesi için cascade ayarlanmışsa doğrudan:
-    db.session.delete(review)
-    db.session.commit()
+    db.session.delete(review)#yetkiliysen yorumu veritabanından sil
+    db.session.commit()#güncellemeleri kaydet
     flash("Yorumunuz silindi.")
     return redirect(url_for('movie_detail', movie_id=review.movie_id))
 

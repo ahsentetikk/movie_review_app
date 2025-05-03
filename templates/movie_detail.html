@@ -2,300 +2,428 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>{{ movie.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ movie.title }} - Film Detay</title>
   <style>
+    /* Temel Stiller */
+    :root {
+      --primary-color: #3b82f6;
+      --danger-color: #ef4444;
+      --success-color: #10b981;
+      --gray-100: #f8fafc;
+      --gray-200: #e2e8f0;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
     body {
-      background-color: #f4f6f8;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--gray-100);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
       margin: 0;
-      padding: 40px;
+      padding: 2rem;
+      color: var(--gray-700);
     }
 
     .container {
-      max-width: 900px;
-      margin: auto;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    .movie-info {
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-bottom: 40px;
-      display: flex;
-      gap: 30px;
+    /* Film Bilgi Bölümü */
+    .movie-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: var(--shadow-md);
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
     }
 
-    .movie-info img {
-      width: 220px;
-      height: 330px;
-      border-radius: 10px;
+    .movie-poster {
+      width: 100%;
+      height: 350px;
+      border-radius: 0.75rem;
       object-fit: cover;
-    }
-
-    .movie-details {
-      flex: 1;
+      box-shadow: var(--shadow-sm);
     }
 
     .movie-details h1 {
-      margin-top: 0;
-      color: #333;
+      margin: 0 0 1rem;
+      font-size: 2rem;
+      color: var(--gray-700);
     }
 
-    .movie-details p {
-      margin: 8px 0;
-      color: #555;
+    .movie-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
     }
 
-    form {
-      background-color: #ffffff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-      margin-bottom: 30px;
+    .movie-meta p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--gray-500);
     }
 
-    label {
-      font-weight: bold;
+    .movie-meta strong {
       display: block;
-      margin-bottom: 5px;
-      margin-top: 15px;
+      margin-bottom: 0.25rem;
+      color: var(--gray-700);
     }
 
-    input[type="number"],
+    /* Yorum Formu */
+    .review-form-section {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 3rem;
+    }
+
+    .section-title {
+      margin: 0 0 1.5rem;
+      font-size: 1.5rem;
+      color: var(--gray-700);
+    }
+
+    .star-rating {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .star-rating input {
+      display: none;
+    }
+
+    .star-rating label {
+      cursor: pointer;
+      font-size: 2rem;
+      color: var(--gray-200);
+      transition: color 0.2s ease;
+    }
+
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+      color: #f59e0b;
+    }
+
     textarea {
       width: 100%;
-      padding: 10px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      margin-bottom: 10px;
+      padding: 1rem;
+      border: 2px solid var(--gray-200);
+      border-radius: 0.5rem;
+      margin-bottom: 1.5rem;
+      resize: vertical;
+      min-height: 120px;
+      font-family: inherit;
     }
 
-    button {
-      padding: 10px 18px;
-      background-color: #2196F3;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      margin-top: 10px;
+    /* Yorum Listesi */
+    .reviews-section {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
     }
 
-    button:hover {
-      background-color: #1976D2;
-    }
-
-    .review {
-      background-color: #fff;
-      padding: 16px 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    .review-card {
+      background: var(--gray-100);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
     }
 
     .review-header {
-      font-weight: bold;
-      color: #333;
-      margin-bottom: 6px;
-      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .review-user {
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .review-date {
+      color: var(--gray-500);
+      font-size: 0.875rem;
+    }
+
+    .review-rating {
+      background: var(--gray-200);
+      color: var(--gray-700);
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.875rem;
+      margin-left: auto;
     }
 
     .review-body {
-      font-size: 15px;
-      color: #444;
-      margin-bottom: 12px;
+      color: var(--gray-700);
+      margin-bottom: 1rem;
       white-space: pre-wrap;
     }
 
-    .reaction-buttons {
+    /* Aksiyon Butonları */
+    .action-buttons {
       display: flex;
-      gap: 16px;
+      gap: 0.75rem;
       align-items: center;
+      margin-top: 1rem;
     }
 
-    .reaction-buttons form {
-      display: flex;
+    .btn {
+      display: inline-flex;
       align-items: center;
-      background: none;
-      border: none;
-      padding: 0;
-    }
-
-    .reaction-buttons button {
-      background: none;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
       border: none;
       cursor: pointer;
-      font-size: 18px;
-      padding: 4px;
-      border-radius: 6px;
-      transition: background-color 0.2s ease;
+      text-decoration: none;
+      font-size: 0.875rem;
     }
 
-    .reaction-buttons button:hover {
-      background-color: #f0f0f0;
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
     }
 
-    .reaction-buttons span {
-      margin-left: 4px;
-      font-size: 14px;
-      color: #666;
+    .btn-primary:hover {
+      background: #2563eb;
     }
 
-    .reply {
-      margin-left: 20px;
-      margin-top: 12px;
-      background-color: #fafafa;
-      padding: 10px 14px;
-      border-left: 3px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #444;
+    .btn-danger {
+      background: var(--danger-color);
+      color: white;
     }
 
-    .reply strong {
-      font-size: 13px;
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-success {
+      background: var(--success-color);
+      color: white;
+    }
+
+    /* Yanıtlar */
+    .replies {
+      margin-left: 2rem;
+      margin-top: 1.5rem;
+      border-left: 2px solid var(--gray-200);
+      padding-left: 1.5rem;
     }
 
     .reply-form {
-      margin-left: 20px;
-      margin-top: 14px;
-      background-color: #fff;
-      padding: 12px;
-      border-radius: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    }
-
-    .reply-form label {
-      font-weight: 500;
-      display: block;
-      margin-bottom: 6px;
+      margin-top: 1rem;
+      background: rgba(241, 245, 249, 0.5);
+      padding: 1rem;
+      border-radius: 0.5rem;
     }
 
     .reply-form textarea {
-      width: 100%;
-      resize: none;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 14px;
+      min-height: 80px;
+      margin-bottom: 1rem;
     }
 
-    .reply-form button {
-      margin-top: 8px;
-      padding: 8px 14px;
-      border: none;
-      background-color: #2196F3;
-      color: white;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-    }
+    /* Responsive Tasarım */
+    @media (max-width: 768px) {
+      .movie-card {
+        grid-template-columns: 1fr;
+      }
 
-    .reply-form button:hover {
-      background-color: #1976D2;
-    }
+      .movie-poster {
+        height: 400px;
+      }
 
-    .actions {
-      margin-top: 10px;
-    }
+      .movie-meta {
+        grid-template-columns: 1fr;
+      }
 
-    .actions form,
-    .actions a {
-      display: inline-block;
-      margin-right: 10px;
+      .replies {
+        margin-left: 1rem;
+      }
     }
-
-    .actions a {
-      color: #2196F3;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .actions a:hover {
-      text-decoration: underline;
-    }
-
     .back-link {
-      margin-top: 30px;
-      display: inline-block;
-      font-size: 15px;
-      color: #2196F3;
-      text-decoration: none;
+  display: inline-block;
+  margin-top: 2rem;
+  font-size: 0.875rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+  /* YENİ EKLENEN STİLLER */
+  .reaction-buttons {
+      display: flex;
+      gap: 1rem;
+      margin: 1rem 0;
     }
 
-    .back-link:hover {
-      text-decoration: underline;
+    .reaction-button {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .reaction-button:hover {
+      opacity: 0.8;
+    }
+
+    .reaction-count {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+    }
+
+    .active-emoji {
+      filter: brightness(0.9);
+      transform: scale(1.1);
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="movie-info">
-      <img src="{{ url_for('static', filename=movie.image_url) }}" alt="{{ movie.title }}">
+    <!-- Film Bilgileri -->
+    <div class="movie-card">
+      <img src="{{ url_for('static', filename=movie.image_url) }}" 
+           alt="{{ movie.title }}" 
+           class="movie-poster">
       <div class="movie-details">
         <h1>{{ movie.title }} ({{ movie.year }})</h1>
-        <p><strong>Tür:</strong> {{ movie.genre }}</p>
-        <p><strong>Yönetmen:</strong> {{ movie.director }}</p>
-        <p><strong>IMDB Puanı:</strong> {{ movie.imdb_rating }}</p>
+        <div class="movie-meta">
+          <p><strong>Tür:</strong> {{ movie.genre }}</p>
+          <p><strong>Yönetmen:</strong> {{ movie.director }}</p>
+          <p><strong>IMDB Puanı:</strong> {{ movie.imdb_rating }}</p>
+          <p><strong>Meta Skoru:</strong> {{ movie.meta_score }}</p>
+          <p><strong>Oyuncular:</strong> 
+            {{ movie.star1 }}, {{ movie.star2 }}, {{ movie.star3 }}, {{ movie.star4 }}
+          </p>
+          <p><strong>Oy Sayısı:</strong> {{ "{:,}".format(movie.no_of_votes) }}</p>
+          <p><strong>Hasılat:</strong> {{ movie.gross }}</p>
+          <p><strong>Süre:</strong> {{ movie.runtime }} dakika</p>
+          <p><strong>Sertifika:</strong> {{ movie.certificate }}</p>
+        </div>
         <p><strong>Konu:</strong> {{ movie.overview }}</p>
       </div>
     </div>
 
-    <h3>Yorum Yap</h3>
-    <form method="POST">
-      <input type="hidden" name="parent_id" value="">
-      <label>Puan (1–10):</label>
-      <input type="number" name="rating" min="1" max="10" required>
-      <label>Yorum:</label>
-      <textarea name="comment" rows="4"></textarea>
-      <button type="submit">Gönder</button>
-    </form>
-
-    <h3>Yorumlar</h3>
-    {% for review in reviews %}
-      <div class="review">
-        <div class="review-header">{{ review.user.username }} - {{ review.date.strftime('%Y-%m-%d') }}</div>
-        <div class="review-body">Puan: {{ review.rating }} / 10<br>{{ review.comment }}</div>
-
-        <div class="reaction-buttons">
-          <form method="POST" action="{{ url_for('react_review', review_id=review.id) }}">
-            <button name="is_like" value="1">👍</button>
-            <span>{{ review.likes|selectattr('is_like','equalto',True)|list|length }}</span>
-          </form>
-          <form method="POST" action="{{ url_for('react_review', review_id=review.id) }}">
-            <button name="is_like" value="0">👎</button>
-            <span>{{ review.likes|selectattr('is_like','equalto',False)|list|length }}</span>
-          </form>
+    <!-- Yorum Formu -->
+    <section class="review-form-section">
+      <h2 class="section-title">Yorum Yap</h2>
+      <form method="POST">
+        <div class="star-rating">
+          {% for i in range(10, 0, -1) %}
+            <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" required>
+            <label for="star{{ i }}">★</label>
+          {% endfor %}
         </div>
+        <textarea name="comment" 
+                  placeholder="Filminiz hakkındaki düşüncelerinizi yazın..."></textarea>
+        <button type="submit" class="btn btn-primary">Yorumu Gönder</button>
+      </form>
+    </section>
 
-        {% if current_user.id == review.user_id %}
-          <div class="actions">
-            <a href="{{ url_for('edit_review', review_id=review.id) }}">Düzenle</a>
-            <form method="POST" action="{{ url_for('delete_review', review_id=review.id) }}" onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
-              <button type="submit">Sil</button>
-            </form>
+    <!-- Yorum Listesi -->
+    <section class="reviews-section">
+      <h2 class="section-title">Yorumlar ({{ reviews|length }})</h2>
+      
+      {% for review in reviews %}
+        <article class="review-card">
+          <div class="review-header">
+            <span class="review-user">{{ review.user.username }}</span>
+            <span class="review-date">{{ review.date.strftime('%d.%m.%Y') }}</span>
+            <span class="review-rating">{{ review.rating }}/10</span>
           </div>
-        {% endif %}
+          <div class="review-body">{{ review.comment }}</div>
 
-        {% for reply in review.replies %}
-          <div class="reply">
-            <strong>{{ reply.user.username }}</strong> → {{ reply.date.strftime('%Y-%m-%d') }}<br>
-            {{ reply.comment }}
-          </div>
-        {% endfor %}
-
-        <form method="POST" class="reply-form">
-          <input type="hidden" name="parent_id" value="{{ review.id }}">
-          <label>Cevapla:</label>
-          <textarea name="comment" rows="2" required></textarea>
-          <button type="submit">Cevapla</button>
+       <!-- LIKE/DISLIKE BUTONLARI -->
+       <div class="reaction-buttons">
+        <form method="POST" action="{{ url_for('react_review', review_id=review.id) }}">
+          <input type="hidden" name="is_like" value="1">
+          <button type="submit" class="reaction-button 
+            {% if review.likes|selectattr('user_id', 'equalto', current_user.id)|list %}active-emoji{% endif %}">
+            👍 <span class="reaction-count">
+              {{ review.likes|selectattr('is_like')|list|length }}
+            </span>
+          </button>
+        </form>
+        
+        <form method="POST" action="{{ url_for('react_review', review_id=review.id) }}">
+          <input type="hidden" name="is_like" value="0">
+          <button type="submit" class="reaction-button 
+            {% if review.likes|rejectattr('is_like')|selectattr('user_id', 'equalto', current_user.id)|list %}active-emoji{% endif %}">
+            👎 <span class="reaction-count">
+              {{ review.likes|rejectattr('is_like')|list|length }}
+            </span>
+          </button>
         </form>
       </div>
-    {% endfor %}
 
-    <a href="{{ url_for('home') }}" class="back-link">← Film listesine dön</a>
+          <!-- Aksiyon Butonları -->
+          {% if current_user.id == review.user_id %}
+    
+
+            <div class="action-buttons">
+              <a href="{{ url_for('edit_review', review_id=review.id) }}" 
+                 class="btn btn-success">
+                ✏️ Düzenle
+              </a>
+              <form method="POST" 
+                    action="{{ url_for('delete_review', review_id=review.id) }}" 
+                    onsubmit="return confirm('Bu yorumu silmek istediğinize emin misiniz?')">
+                <button type="submit" class="btn btn-danger">
+                  🗑️ Sil
+                </button>
+              </form>
+            </div>
+          {% endif %}
+
+          <!-- Yanıtlar -->
+          <div class="replies">
+            {% for reply in review.replies %}
+              <div class="review-card">
+                <div class="review-header">
+                  <span class="review-user">{{ reply.user.username }}</span>
+                  <span class="review-date">{{ reply.date.strftime('%d.%m.%Y') }}</span>
+                </div>
+                <div class="review-body">{{ reply.comment }}</div>
+              </div>
+            {% endfor %}
+
+            <!-- Yanıt Formu -->
+            <form method="POST" class="reply-form">
+              <input type="hidden" name="parent_id" value="{{ review.id }}">
+              <textarea name="comment" 
+                        placeholder="Yanıt yaz..."></textarea>
+              <button type="submit" class="btn btn-primary">Yanıtla</button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    </section>
+    <a href="{{ url_for('home') }}" class="back-link">
+      ← Film listesine dön
+    </a>
   </div>
 </body>
 </html>
