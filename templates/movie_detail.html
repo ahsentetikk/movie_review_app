@@ -343,6 +343,20 @@
       </form>
     </section>
 
+    {% if keywords %}
+  <section class="reviews-section" style="margin-bottom: 2rem;">
+    <h2 class="section-title">💡 Öne Çıkan Anahtar Kelimeler</h2>
+    <ul style="display: flex; flex-wrap: wrap; gap: 10px; padding-left: 0;">
+      {% for keyword in keywords %}
+        <li style="list-style: none; background-color: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 999px; font-size: 0.9rem;">
+          {{ keyword }}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+
     <!-- Yorum Listesi -->
     <section class="reviews-section">
       <h2 class="section-title">Yorumlar ({{ reviews|length }})</h2>

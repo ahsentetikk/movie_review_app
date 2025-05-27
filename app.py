@@ -1,8 +1,11 @@
+import recommend
 from flask import Flask, abort, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from models import db, User, Movie, Review, ReviewLike
+from recommend import get_movie_recommendations_for_user
+from keyword_extractor import extract_keywords_from_comments
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -343,53 +346,86 @@ def logout():
 # Anasayfa 
 @app.route('/')
 def home():
-    query = request.args.get('query', '')  # Arama çubuğundan gelen sorgu 
-    if query: #search butonu için yaptım 
-        movies = Movie.query.filter(Movie.title.ilike(f"%{query}%")).all() #burada title araması yapılıyor
+    with app.app_context():
+        all_movies = Movie.query.all()
+        print("\n📌 Mevcut Film ID'leri:")
+        for movie in all_movies:
+            print(f"ID: {movie.id}, Title: {movie.title}")
+
+    query = request.args.get('query', '')  
+    if query:
+        movies = Movie.query.filter(Movie.title.ilike(f"%{query}%")).all()
     else:
-        movies = Movie.query.all() # Eğer arama yapılmadıysa tüm filmleri getir
-    return render_template("home.html", movies=movies)
+        movies = Movie.query.all()
+
+    # En çok beğenilen ilk 5 filmi getir
+    top_movies = (
+        db.session.query(Movie, db.func.avg(Review.rating).label('avg_rating'))
+        .join(Review)
+        .group_by(Movie.id)
+        .order_by(db.func.avg(Review.rating).desc())
+        .limit(5)
+        .all()
+    )
+
+    # AI önerileri (sadece giriş yapılmışsa)
+    ai_recommendations = []
+    if current_user.is_authenticated:
+        ai_recommendations = recommend.get_movie_recommendations_for_user(db, current_user.id)
+        print("Önerilen filmler:", [m.title for m in ai_recommendations])
+
+    return render_template("home.html", movies=movies, top_movies=top_movies, ai_recommendations=ai_recommendations)
 
 
 
 # Film detayları ve yorumlar
 @app.route('/movie/<int:movie_id>', methods=['GET', 'POST'])
-@login_required #yorum yapabilmek için giriş yapmış olmalısınız hatta bunun için bir uyarı mesajı verebilirsin(yorum sadece)
+@login_required  # 🎯 Sadece giriş yapan kullanıcı yorum yapabilir
 def movie_detail(movie_id):
-    movie = Movie.query.get_or_404(movie_id) #movie_id ile veritabanından filmi getirir, bulamazsa 404 hatası döner
+    movie = Movie.query.get_or_404(movie_id)  # ID'ye göre film bulunur, yoksa 404
 
     if request.method == 'POST':
-        parent_id = request.form.get('parent_id') or None # Kullanıcının cevabını alır
-        comment   = request.form['comment'] # Kullanıcının yazdığı yorum alınır
+        parent_id = request.form.get('parent_id') or None
+        comment = request.form['comment']
 
-       
-        if parent_id: # eğer parent_id varsa, bu bir yorumun cevabıdır
-           
+        if not comment.strip():
+            flash("Yorum boş olamaz.", "warning")
+            return redirect(url_for('movie_detail', movie_id=movie.id))
+
+        if parent_id:
+            # Cevap niteliğinde yorum
             review = Review(
-                user_id   = current_user.id,
-                movie_id  = movie.id,
-                rating    = 0,         # cevap yorumlarında puan verilmez, sıfır atanır
-                comment   = comment,
-                parent_id = parent_id  # bağlı olduğu ana yorum
+                user_id=current_user.id,
+                movie_id=movie.id,
+                rating=0,
+                comment=comment,
+                parent_id=parent_id
             )
-        else: # eğer parent_id yoksa, bu doğrudan filme yazılan yeni bir yorumdur
-           
+        else:
+            # Doğrudan filme yapılan yorum
             rating = int(request.form['rating'])
             review = Review(
-                user_id   = current_user.id,
-                movie_id  = movie.id,
-                rating    = rating,
-                comment   = comment,
-                parent_id = None  # Ana yorum
+                user_id=current_user.id,
+                movie_id=movie.id,
+                rating=rating,
+                comment=comment,
+                parent_id=None
             )
 
         db.session.add(review)
         db.session.commit()
+        flash("Yorum başarıyla kaydedildi.", "success")
         return redirect(url_for('movie_detail', movie_id=movie.id))
 
-    # GET isteği: gfilm detay sayfası açıldığında burası çalışır
-    reviews = Review.query.filter_by(movie_id=movie.id, parent_id=None).all() # sadece ana yorumlar (cevaplar değil) çekilir
-    return render_template("movie_detail.html", movie=movie, reviews=reviews)
+    # GET isteği olduğunda çalışır
+    reviews = Review.query.filter_by(movie_id=movie.id, parent_id=None).all()
+
+    # 🎯 Anahtar kelime çıkarımı yapılır
+    all_comments = [r.comment for r in reviews if r.comment]
+    keywords = extract_keywords_from_comments(all_comments)
+
+    return render_template("movie_detail.html", movie=movie, reviews=reviews, keywords=keywords)
+
 
 
 # Like/dislike
@@ -450,6 +486,7 @@ def delete_review(review_id):
     db.session.commit()#güncellemeleri kaydet
     flash("Yorumunuz silindi.")
     return redirect(url_for('movie_detail', movie_id=review.movie_id))
+
 
 
 if __name__ == '__main__':

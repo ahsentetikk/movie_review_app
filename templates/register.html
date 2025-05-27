@@ -34,7 +34,7 @@
       flex-direction: column;
     }
 
-    input {
+    input, select {
       padding: 12px;
       margin-bottom: 16px;
       border: 1px solid #ccc;
@@ -81,7 +81,15 @@
       <input name="email" placeholder="E-posta" required type="email">
       <input name="full_name" placeholder="Ad Soyad" required>
       <input name="birth_year" placeholder="Doğum Yılı" required type="number">
-      <input name="gender" placeholder="Cinsiyet">
+      
+      <select name="gender">
+        <option value="">Cinsiyet Seçiniz</option>
+        <option value="Kadın">Kadın</option>
+        <option value="Erkek">Erkek</option>
+        <option value="Diğer">Diğer</option>
+        <option value="Belirtmek istemiyorum">Belirtmek istemiyorum</option>
+      </select>
+      
       <input name="country" placeholder="Ülke">
       <input name="password" placeholder="Şifre" required type="password">
       <button type="submit">Kayıt Ol</button>
